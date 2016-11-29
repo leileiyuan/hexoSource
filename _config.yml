@@ -3,16 +3,17 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 一半记忆，一半继续
+title: Hope you never grow old
 subtitle: # 副标题
 description: 苟全性命于乱世，不求闻达于诸侯
 author: leileiyuan
+email: java@leileiyuan.top
 language: zh-Hans # next zh-Hans
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://github.com/leileiyuan
+url: http://leileiyuan.top
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
