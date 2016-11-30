@@ -71,3 +71,4 @@ theme: next #  | yilia
 deploy:
   type: git
   repository: https://github.com/leileiyuan/leileiyuan.github.io.git,master
+

@@ -1,6 +1,6 @@
 ---
 title: redis分片式集群，整合spring
-date: 2016-11-26 15:29:28
+date: 2016-11-15 15:29:28
 tags:
  - redis
  - spring
