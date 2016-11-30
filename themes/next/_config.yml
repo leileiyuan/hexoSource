@@ -6,7 +6,7 @@
 favicon: /favicon.ico
 
 # Set default keywords (Use a comma to separate)
-keywords: "Hexo, NexT"
+keywords: "leileiyuan,leileiyuan.top,java,redis,redis集群,spring,spring data jpa"
 
 # Set rss to false to disable feed link.
 # Leave rss as empty to use site's feed link.
@@ -14,7 +14,7 @@ keywords: "Hexo, NexT"
 rss: # /atom.xml
 
 # Specify the date when the site was setup
-since: 2016
+since: 2015
 
 # Footer `powered-by` and `theme-info` copyright
 copyright: true
@@ -175,7 +175,7 @@ toc:
 #creative_commons: by-nc-sa
 #creative_commons:
 
-          
+
 sidebar: # 侧栏仅在文章页面（拥有目录列表）时才显示 。目前仅 Pisces Scheme 支持 position 配置 。
   # Sidebar Position, available value: left | right
   position: left # left | right 
@@ -285,12 +285,6 @@ search:
 
 # Duoshuo ShortName 多说评论
 duoshuo_shortname: leileiyuan
-#duoshuo: 
- # on: true
- #domain: http://leileiyuan.duoshuo.com
-  # 是否开启多说评论，http://duoshuo.com/create-site/
-  # 使用上面网址登陆你的多说，然后创建站点，在 domain 中填入你设定的域名
-  # http://你的多说域名.duoshuo.com
 
 
 # Disqus
@@ -315,7 +309,7 @@ duoshuo_shortname: leileiyuan
 
 
 # Share
-duoshuo_share: true
+#  duoshuo_share: true
 
 # Google Webmaster tools verification setting
 # See: https://www.google.com/webmasters/
@@ -335,10 +329,10 @@ duoshuo_share: true
 # Make duoshuo show UA
 # user_id must NOT be null when admin_enable is true!
 # you can visit http://dev.duoshuo.com get duoshuo user id.
-duoshuo_info:
-  ua_enable: true
-  admin_enable: false
-  user_id: 0
+#duoshuo_info:
+#  ua_enable: true
+#  admin_enable: false
+ # user_id: 0
   #admin_nickname: Author
 
 
