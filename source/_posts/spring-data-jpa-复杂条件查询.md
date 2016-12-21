@@ -357,9 +357,6 @@ public class SimpleExpression implements Criterion {
 	private Object value2;           	// 属性所对应的值 使用在between时，第二个比较的数据值
 	private Operator operator;      	// 运算符
 
-	/* (non-Javadoc)
-	 * @see com.creditease.b2bsettle.basedata.util.criteria.Criterion#toPredicate(javax.persistence.criteria.Root, javax.persistence.criteria.CriteriaQuery, javax.persistence.criteria.CriteriaBuilder)
-	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" }) 
 	@Override
 	public Predicate toPredicate(Root<?> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
@@ -448,7 +445,6 @@ import java.util.Collection;
 
 import org.springframework.util.StringUtils;
 
-import com.creditease.b2bsettle.basedata.util.page.criteria.Criterion.Operator;
 
 /** 
  * Description: 条件构造器
