@@ -235,7 +235,6 @@ public class Criteria<T> implements Specification<T> {
 `toPredicate(...)`方法，跟`org.springframework.data.jpa.domain.Specification<T>`接口的`toPredicate`方法一样。用来**构建条件**的。
 
 ```java
-package com.creditease.b2bsettle.basedata.util.page.criteria;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
