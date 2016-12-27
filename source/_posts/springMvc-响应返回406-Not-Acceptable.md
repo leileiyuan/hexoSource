@@ -9,7 +9,9 @@ categories:
  - spring mvc
 ---
 
-请求地址，响应返回406 Not Acceptable
+spirngMvc请求时，响应返回406 Not Acceptable问题的分析和解决。
+<!-- more -->
+请求地址：
 
 	http://sso.taotao.com/user/yuanleilei/1.html?r=0.950404558563605
 
