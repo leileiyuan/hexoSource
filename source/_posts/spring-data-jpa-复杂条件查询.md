@@ -6,7 +6,6 @@ tags:
  - spring data jpa
 categories: 
  - spring dta jpa
- - spring
 ---
 
 使用 `spring data jpa` 封装的任意条件查询，可使用`Pageable`定义分页和排序。
