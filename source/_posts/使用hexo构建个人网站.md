@@ -3,7 +3,7 @@ title: 使用Hexo构建个人博客
 date: 2016-8-9 10:52:24
 tags: 
  - hexo
-categories: Hexo
+categories: gexo
 ---
 
 hexo是一个快速、简单的博客框架。可能通过Markdown语言编写文章。hexo来帮助你生成各种主题风格的静态网站，支持多终端访问

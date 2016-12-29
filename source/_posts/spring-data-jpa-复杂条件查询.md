@@ -6,7 +6,6 @@ tags:
  - spring data jpa
 categories: 
  - spring dta jpa
- - spring
 ---
 
 使用 `spring data jpa` 封装的任意条件查询，可使用`Pageable`定义分页和排序。
@@ -235,7 +234,6 @@ public class Criteria<T> implements Specification<T> {
 `toPredicate(...)`方法，跟`org.springframework.data.jpa.domain.Specification<T>`接口的`toPredicate`方法一样。用来**构建条件**的。
 
 ```java
-package com.creditease.b2bsettle.basedata.util.page.criteria;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -358,9 +356,6 @@ public class SimpleExpression implements Criterion {
 	private Object value2;           	// 属性所对应的值 使用在between时，第二个比较的数据值
 	private Operator operator;      	// 运算符
 
-	/* (non-Javadoc)
-	 * @see com.creditease.b2bsettle.basedata.util.criteria.Criterion#toPredicate(javax.persistence.criteria.Root, javax.persistence.criteria.CriteriaQuery, javax.persistence.criteria.CriteriaBuilder)
-	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" }) 
 	@Override
 	public Predicate toPredicate(Root<?> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
@@ -449,7 +444,6 @@ import java.util.Collection;
 
 import org.springframework.util.StringUtils;
 
-import com.creditease.b2bsettle.basedata.util.page.criteria.Criterion.Operator;
 
 /** 
  * Description: 条件构造器

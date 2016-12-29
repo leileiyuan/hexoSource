@@ -9,19 +9,17 @@ categories:
 ---
 
 在windows下安装`msysgit`，使用`git`命令操作仓库，并推送到远程`github`仓库。
- 安装过以后，打开 `Git Bash`,会显示类型以下信息
+安装过以后，打开 `Git Bash`,会显示类型以下信息
  
 	leileiyuan@08-201508200156 MINGW64 ~
 	$
 
 输入`git --version`命令，显示版本号。
-<!--more-->
 
 	$ git --version
 	git version 2.9.3.windows.2
 
-	 
- 本地建立工作环境，提交到远程仓库中。最简步骤：
+本地建立工作环境，提交到远程仓库中。最简步骤：
 
 	makdir blog                         -- 创建一个项目blog  
 	$ cd blog                           -- 打开这个项目
