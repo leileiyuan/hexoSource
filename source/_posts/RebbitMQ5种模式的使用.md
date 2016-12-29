@@ -29,4 +29,3 @@ RabbitMQ官网[http://www.rabbitmq.com](http://www.rabbitmq.com)提供了6种消
 **6 RPC**
 远程调用，这种模式，严格意义上来讲，不算是消息队列。可以使用专门的RPC服务框架(比如dubbo：[http://dubbo.io/](http://dubbo.io/))
 ![](/img/rabbitmq/java-six.png)
-
