@@ -234,7 +234,7 @@ public class Consumer2 {
 X(Exchanges)：交换机
 ![](/img/rabbitmq/java-three.png)
 
-> 消息发送到交换机，没有队列绑定到交换机时，消息将丢失，交换机没有存储消息的能力。
+> 消息发送到交换机，没有队列绑定到交换机时，消息将丢失。交换机没有存储消息的能力。
 
 场景：商品进行了添加或更新，需要通知给某前台系统刷新缓存，通知给某搜索系统更新数据刷新缓存
 生产者：
@@ -342,8 +342,143 @@ public class Recv2 {
 	 搜索系统： '商品已经被更新，id=1001'
 	 前台系统： '商品已经被更新，id=1001'
 
+**交换机类型：`Fanout Exchange`**
+订阅模式中，这种交换机叫做`Fanout Exchange`， 不处理路由键。你只需要简单的将队列绑定到交换机上。一个发送到交换机的消息都会被转发到与该交换机绑定的所有队列上。很像子网广播，每台子网内的主机都获得了一份复制的消息。Fanout交换机转发消息是最快的。
+![](/img/rabbitmq/exchange-one.png)
+不设置路由key：
+```java
+	Channel channel = connection.createChannel();  
+	channel.exchangeDeclare("exchangeName", "fanout"); //direct fanout topic  
+	channel.queueDeclare("queueName");  
+	channel.queueBind("queueName", "exchangeName", "routingKey");   
+	 
+	channel.queueDeclare("queueName1");  
+	channel.queueBind("queueName1", "exchangeName", "routingKey1");  
+	  
+	byte[] messageBodyBytes = "hello world".getBytes();  
+	//路由键需要设置为空  
+	channel.basicPublish("exchangeName", "", MessageProperties.PERSISTENT_TEXT_PLAIN, messageBodyBytes); 
+```
+
 **4 Routing**
-![](/img/rabbitmq/java-four.png)
+路由模式。当消费者绑定队列到交换机时，指定路由key。
+如下图，消费者一将队列绑定到交换机时，指定的路由为error，消费者二将队列绑定到交换机时，指定的路由为是info、error、warning，那么不同的消息可以发送给特定的消费者
+[](/img/rabbitmq/java-four.png)
+
+生产者：生产者将路由key为"inster"的消息发送到交换机
+```java
+public class Send {
+    private final static String EXCHANGE_NAME = "test_exchange_direct";
+    public static void main(String[] argv) throws Exception {
+        // 获取到连接以及mq通道
+        Connection connection = ConnectionUtil.getConnection();
+        Channel channel = connection.createChannel();
+
+        // 声明exchange
+        channel.exchangeDeclare(EXCHANGE_NAME, "direct");
+
+        // 消息内容
+        String message = "商品删除，id=1002";
+        channel.basicPublish(EXCHANGE_NAME, "insert", null, message.getBytes());
+        System.out.println(" 后台系统： '" + message + "'");
+
+        channel.close();
+        connection.close();
+    }
+}
+```
+消费者一：消费者一绑定队列到交换机，获取路由key为"update"或"delete"的消息。此时没有获取到消息，生产者发送的消息，路由key为"insert"，所以消费者一接受不到消息。
+```java
+public class Recv {
+    private final static String QUEUE_NAME = "test_queue_direct_1";
+    private final static String EXCHANGE_NAME = "test_exchange_direct";
+    public static void main(String[] argv) throws Exception {
+
+        // 获取到连接以及mq通道
+        Connection connection = ConnectionUtil.getConnection();
+        Channel channel = connection.createChannel();
+
+        // 声明队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+
+        // 绑定队列到交换机
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "update");
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "delete");
+
+        // 同一时刻服务器只会发一条消息给消费者
+        channel.basicQos(1);
+
+        // 定义队列的消费者
+        QueueingConsumer consumer = new QueueingConsumer(channel);
+        // 监听队列，手动返回完成
+        channel.basicConsume(QUEUE_NAME, false, consumer);
+
+        // 获取消息
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            String message = new String(delivery.getBody());
+            System.out.println(" 前台系统： '" + message + "'");
+            Thread.sleep(10);
+
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+        }
+    }
+}
+```
+消费者二：消费者二可以接受到由生产者发送的消息，路由key都包含有"insert"
+```java
+public class Recv2 {
+    private final static String QUEUE_NAME = "test_queue_direct_2";
+    private final static String EXCHANGE_NAME = "test_exchange_direct";
+    public static void main(String[] argv) throws Exception {
+
+        // 获取到连接以及mq通道
+        Connection connection = ConnectionUtil.getConnection();
+        Channel channel = connection.createChannel();
+
+        // 声明队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+
+        // 绑定队列到交换机
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "insert");
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "update");
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "delete");
+
+        // 同一时刻服务器只会发一条消息给消费者
+        channel.basicQos(1);
+
+        // 定义队列的消费者
+        QueueingConsumer consumer = new QueueingConsumer(channel);
+        // 监听队列，手动返回完成
+        channel.basicConsume(QUEUE_NAME, false, consumer);
+
+        // 获取消息
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            String message = new String(delivery.getBody());
+            System.out.println(" 搜索系统： '" + message + "'");
+            Thread.sleep(10);
+
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+        }
+    }
+}
+```
+
+**交换机类型：`Direct Exchange`**
+路由模式中的交换机叫做`Direct Exchange`，该交换处理路由键。需要将一个队列绑定到交换机上，要求该消息与一个特定的路由键完全匹配。这是一个完整的匹配。如果一个队列绑定到该交换机上要求路由键 “insert”，则只有被标记为“insert”的消息才被转发，不会转发update，也不会转发delete，只会转发insert。 
+![](/img/rabbitmq/exchange-two.png)
+处理路由key:
+```java
+	Channel channel = connection.createChannel();  
+	channel.exchangeDeclare("exchangeName", "direct"); //direct fanout topic  
+	channel.queueDeclare("queueName");  
+	channel.queueBind("queueName", "exchangeName", "routingKey");  
+	  
+	byte[] messageBodyBytes = "hello world".getBytes();  
+	//需要绑定路由键  
+	channel.basicPublish("exchangeName", "routingKey", MessageProperties.PERSISTENT_TEXT_PLAIN, messageBodyBytes);  
+```
 
 **5 Topics**
 ![](/img/rabbitmq/java-five.png)
