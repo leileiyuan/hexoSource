@@ -25,22 +25,22 @@ import com.rabbitmq.client.Connection;
 import cn.itcast.rabbitmq.util.ConnectionUtil;
 /** 生产者 */
 public class Producer {
-	private final static String QUEUE_NAME = "hello";
-	public static void main(String[] args) throws Exception {
-		// 获取MQ连接及通道
-		Connection connection = ConnectionUtil.getConnection();
-		Channel channel = connection.createChannel();
-		// 声明（创建）队列
-		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-		// 发送消息
-		String message = "Hello World!";
-		channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
-		System.out.println(" [x] Sent '" + message + "'");
+    private final static String QUEUE_NAME = "hello";
+    public static void main(String[] args) throws Exception {
+        // 获取MQ连接及通道
+        Connection connection = ConnectionUtil.getConnection();
+        Channel channel = connection.createChannel();
+        // 声明（创建）队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+        // 发送消息
+        String message = "Hello World!";
+        channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
+        System.out.println(" [x] Sent '" + message + "'");
 
-		// 关闭通道和连接
-		channel.close();
-		connection.close();
-	}
+        // 关闭通道和连接
+        channel.close();
+        connection.close();
+    }
 }
 ```
 简单队列消费者：
@@ -52,26 +52,26 @@ import com.rabbitmq.client.QueueingConsumer;
 import cn.itcast.rabbitmq.util.ConnectionUtil;
 /** 消费者 */
 public class Consumer {
-	private final static String QUEUE_NAME = "hello";
-	public static void main(String[] args) throws Exception {
-		// 获取连接及通道
-		Connection connection = ConnectionUtil.getConnection();
-		Channel channel = connection.createChannel();
-		// 声明队列
-		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+    private final static String QUEUE_NAME = "hello";
+    public static void main(String[] args) throws Exception {
+        // 获取连接及通道
+        Connection connection = ConnectionUtil.getConnection();
+        Channel channel = connection.createChannel();
+        // 声明队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 
-		// 定义队列的消费者
-		QueueingConsumer consumer = new QueueingConsumer(channel);
-		// 监听队列
-		channel.basicConsume(QUEUE_NAME, true, consumer);
+        // 定义队列的消费者
+        QueueingConsumer consumer = new QueueingConsumer(channel);
+        // 监听队列
+        channel.basicConsume(QUEUE_NAME, true, consumer);
 
-		// 获取消息
-		while (true) {
-			QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-			String message = new String(delivery.getBody(), "UTF-8");
-			System.out.println(" [x] Received '" + message + "'");
-		}
-	}
+        // 获取消息
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            String message = new String(delivery.getBody(), "UTF-8");
+            System.out.println(" [x] Received '" + message + "'");
+        }
+    }
 }
 ```
 
@@ -83,60 +83,60 @@ Work模式的队列是一个生产者对应多个消费者，消息是竞争的�
 ```java
 /** 生产者 */
 public class Producer {
-	private final static String QUEUE_NAME = "queue_work";
-	public static void main(String[] args) throws Exception {
-		// 获取MQ连接及通道
-		Connection connection = ConnectionUtil.getConnection();
-		Channel channel = connection.createChannel();
-		// 声明（创建）队列
-		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-		// 发送消息
+    private final static String QUEUE_NAME = "queue_work";
+    public static void main(String[] args) throws Exception {
+        // 获取MQ连接及通道
+        Connection connection = ConnectionUtil.getConnection();
+        Channel channel = connection.createChannel();
+        // 声明（创建）队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+        // 发送消息
 
-		for (int i = 0; i < 50; i++) {
-			// 消息内容
-			String message = "" + i;
-			channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
-			System.out.println(" [x] Sent '" + message + "'");
+        for (int i = 0; i < 50; i++) {
+            // 消息内容
+            String message = "" + i;
+            channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
+            System.out.println(" [x] Sent '" + message + "'");
 
-			Thread.sleep(i * 10);
-		}
+            Thread.sleep(i * 10);
+        }
 
-		// 关闭通道和连接
-		channel.close();
-		connection.close();
-	}
+        // 关闭通道和连接
+        channel.close();
+        connection.close();
+    }
 }
 ```
 消费者一：
 ```java
 /** 消费者一 */
 public class Consumer {
-	private final static String QUEUE_NAME = "queue_work";
-	public static void main(String[] args) throws Exception {
-		// 获取连接及通道
-		Connection connection = ConnectionUtil.getConnection();
-		Channel channel = connection.createChannel();
-		// 声明队列
-		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+    private final static String QUEUE_NAME = "queue_work";
+    public static void main(String[] args) throws Exception {
+        // 获取连接及通道
+        Connection connection = ConnectionUtil.getConnection();
+        Channel channel = connection.createChannel();
+        // 声明队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 
         // 同一时刻服务器只会发一条消息给消费者
         //channel.basicQos(1);
 
-		// 定义队列的消费者
-		QueueingConsumer consumer = new QueueingConsumer(channel);
-		// 监听队列,设置为false，手动返回状态
-		channel.basicConsume(QUEUE_NAME, false, consumer);
+        // 定义队列的消费者
+        QueueingConsumer consumer = new QueueingConsumer(channel);
+        // 监听队列,设置为false，手动返回状态
+        channel.basicConsume(QUEUE_NAME, false, consumer);
 
-		// 获取消息
-		while (true) {
-			QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-			String message = new String(delivery.getBody(), "UTF-8");
-			System.out.println(" Consumer111 [x] Received '" + message + "'");
+        // 获取消息
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            String message = new String(delivery.getBody(), "UTF-8");
+            System.out.println(" Consumer111 [x] Received '" + message + "'");
             // 休眠10毫秒
             Thread.sleep(10);
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-		}
-	}
+        }
+    }
 }
 ```
 
@@ -144,54 +144,54 @@ public class Consumer {
 ```java
 /** 消费者二 */
 public class Consumer2 {
-	private final static String QUEUE_NAME = "queue_work";
-	public static void main(String[] args) throws Exception {
-		// 获取连接及通道
-		Connection connection = ConnectionUtil.getConnection();
-		Channel channel = connection.createChannel();
-		// 声明队列
-		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+    private final static String QUEUE_NAME = "queue_work";
+    public static void main(String[] args) throws Exception {
+        // 获取连接及通道
+        Connection connection = ConnectionUtil.getConnection();
+        Channel channel = connection.createChannel();
+        // 声明队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 
         // 同一时刻服务器只会发一条消息给消费者
         //channel.basicQos(1);
 
-		// 定义队列的消费者
-		QueueingConsumer consumer = new QueueingConsumer(channel);
-		// 监听队列,设置为false，手动返回状态
-		channel.basicConsume(QUEUE_NAME, false, consumer);
+        // 定义队列的消费者
+        QueueingConsumer consumer = new QueueingConsumer(channel);
+        // 监听队列,设置为false，手动返回状态
+        channel.basicConsume(QUEUE_NAME, false, consumer);
 
-		// 获取消息
-		while (true) {
-			QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-			String message = new String(delivery.getBody(), "UTF-8");
-			System.out.println("Consumer2 [x] Received '" + message + "'");
-			
+        // 获取消息
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            String message = new String(delivery.getBody(), "UTF-8");
+            System.out.println("Consumer2 [x] Received '" + message + "'");
+            
             // 休眠1秒
             Thread.sleep(1000);
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-		}
-	}
+        }
+    }
 }
 ```
 
 运行结果：
 消费者一：
 
-	Consumer111 [x] Received '1'
-	Consumer111 [x] Received '3'
-	Consumer111 [x] Received '5'
-	 
+    Consumer111 [x] Received '1'
+    Consumer111 [x] Received '3'
+    Consumer111 [x] Received '5'
+     
 消费者二：
 
-	Consumer2 [x] Received '0'
-	Consumer2 [x] Received '2'
-	Consumer2 [x] Received '4'
-	Consumer2 [x] Received '6'
-	Consumer2 [x] Received '8'
+    Consumer2 [x] Received '0'
+    Consumer2 [x] Received '2'
+    Consumer2 [x] Received '4'
+    Consumer2 [x] Received '6'
+    Consumer2 [x] Received '8'
 实际结果是，消费者一和消费者二，交替获取消息。并非"能者多劳"，我们要对通道设置一个值，同一时刻只发一条消息给消费者：
 
-	// 同一时刻服务器只会发一条消息给消费者
-	channel.basicQos(1);
+    // 同一时刻服务器只会发一条消息给消费者
+    channel.basicQos(1);
 如此，消息便会产生争抢。
 
 **消息确认**
@@ -203,29 +203,29 @@ public class Consumer2 {
 手动模式：
 消费者收到消息，给服务器一个反馈。
 ```java
-	// 定义队列的消费者
-	QueueingConsumer consumer = new QueueingConsumer(channel);
-	// 监听队列,设置为false，手动返回完成
-	channel.basicConsume(QUEUE_NAME, false, consumer);
+    // 定义队列的消费者
+    QueueingConsumer consumer = new QueueingConsumer(channel);
+    // 监听队列,设置为false，手动返回完成
+    channel.basicConsume(QUEUE_NAME, false, consumer);
 
-	// 获取消息
-	while (true) {
-		QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-		String message = new String(delivery.getBody(), "UTF-8");
-		System.out.println("Consumer2 [x] Received '" + message + "'");
-		
+    // 获取消息
+    while (true) {
+        QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+        String message = new String(delivery.getBody(), "UTF-8");
+        System.out.println("Consumer2 [x] Received '" + message + "'");
+        
            // 休眠1秒
            Thread.sleep(1000);
            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-	}
+    }
 ```
 
 自动模式：
 ```java
-	// 定义队列的消费者
-	QueueingConsumer consumer = new QueueingConsumer(channel);
-	// 监听队列
-	channel.basicConsume(QUEUE_NAME, true, consumer);
+    // 定义队列的消费者
+    QueueingConsumer consumer = new QueueingConsumer(channel);
+    // 监听队列
+    channel.basicConsume(QUEUE_NAME, true, consumer);
 ```
 
 **3 Publish/Subscribe**
@@ -338,26 +338,26 @@ public class Recv2 {
 
 运行结果：消费者一和消费者二 都会收到该消息
 
-	 后台系统： '商品已经被更新，id=1001'//生产者
-	 搜索系统： '商品已经被更新，id=1001'
-	 前台系统： '商品已经被更新，id=1001'
+     后台系统： '商品已经被更新，id=1001'//生产者
+     搜索系统： '商品已经被更新，id=1001'
+     前台系统： '商品已经被更新，id=1001'
 
 **交换机类型：`Fanout Exchange`**
 订阅模式中，这种交换机叫做`Fanout Exchange`， 不处理路由键。你只需要简单的将队列绑定到交换机上。一个发送到交换机的消息都会被转发到与该交换机绑定的所有队列上。很像子网广播，每台子网内的主机都获得了一份复制的消息。Fanout交换机转发消息是最快的。
 ![](/img/rabbitmq/exchange-one.png)
 不设置路由key：
 ```java
-	Channel channel = connection.createChannel();  
-	channel.exchangeDeclare("exchangeName", "fanout"); //direct fanout topic  
-	channel.queueDeclare("queueName");  
-	channel.queueBind("queueName", "exchangeName", "routingKey");   
-	 
-	channel.queueDeclare("queueName1");  
-	channel.queueBind("queueName1", "exchangeName", "routingKey1");  
-	  
-	byte[] messageBodyBytes = "hello world".getBytes();  
-	//路由键需要设置为空  
-	channel.basicPublish("exchangeName", "", MessageProperties.PERSISTENT_TEXT_PLAIN, messageBodyBytes); 
+    Channel channel = connection.createChannel();  
+    channel.exchangeDeclare("exchangeName", "fanout"); //direct fanout topic  
+    channel.queueDeclare("queueName");  
+    channel.queueBind("queueName", "exchangeName", "routingKey");   
+     
+    channel.queueDeclare("queueName1");  
+    channel.queueBind("queueName1", "exchangeName", "routingKey1");  
+      
+    byte[] messageBodyBytes = "hello world".getBytes();  
+    //路由键需要设置为空  
+    channel.basicPublish("exchangeName", "", MessageProperties.PERSISTENT_TEXT_PLAIN, messageBodyBytes); 
 ```
 
 **4 Routing**
@@ -470,18 +470,135 @@ public class Recv2 {
 ![](/img/rabbitmq/exchange-two.png)
 处理路由key:
 ```java
-	Channel channel = connection.createChannel();  
-	channel.exchangeDeclare("exchangeName", "direct"); //direct fanout topic  
-	channel.queueDeclare("queueName");  
-	channel.queueBind("queueName", "exchangeName", "routingKey");  
-	  
-	byte[] messageBodyBytes = "hello world".getBytes();  
-	//需要绑定路由键  
-	channel.basicPublish("exchangeName", "routingKey", MessageProperties.PERSISTENT_TEXT_PLAIN, messageBodyBytes);  
+    Channel channel = connection.createChannel();  
+    channel.exchangeDeclare("exchangeName", "direct"); //direct fanout topic  
+    channel.queueDeclare("queueName");  
+    channel.queueBind("queueName", "exchangeName", "routingKey");  
+      
+    byte[] messageBodyBytes = "hello world".getBytes();  
+    //需要绑定路由键  
+    channel.basicPublish("exchangeName", "routingKey", MessageProperties.PERSISTENT_TEXT_PLAIN, messageBodyBytes);  
 ```
 
 **5 Topics**
+通配符模式。
+`#`：匹配一个或多个词；
+`*`：匹配一个词
+符号"#"匹配一个或多个词，符号"\*"匹配不多不少一个词。因此“audit.#”能够匹配到“audit.irs.corporate”，但是“audit.\*” 只会匹配到“audit.irs”。
+
 ![](/img/rabbitmq/java-five.png)
+
+消费者一获取的消息只能是"item.update" 、"item.delete"；消费者二获取的消息只能是以"item."开头的
+生产者：
+```java
+public class Send {
+    private final static String EXCHANGE_NAME = "test_exchange_topic";
+    public static void main(String[] argv) throws Exception {
+        // 获取到连接以及mq通道
+        Connection connection = ConnectionUtil.getConnection();
+        Channel channel = connection.createChannel();
+
+        // 声明exchange
+        channel.exchangeDeclare(EXCHANGE_NAME, "topic");
+
+        // 消息内容
+        String message = "商品删除，id=1003";
+        channel.basicPublish(EXCHANGE_NAME, "item.delete", null, message.getBytes());
+        System.out.println(" 后台系统： '" + message + "'");
+
+        channel.close();
+        connection.close();
+    }
+}
+```
+消费者一：
+```java
+public class Recv {
+    private final static String QUEUE_NAME = "test_queue_topic_1";
+    private final static String EXCHANGE_NAME = "test_exchange_topic";
+    public static void main(String[] argv) throws Exception {
+
+        // 获取到连接以及mq通道
+        Connection connection = ConnectionUtil.getConnection();
+        Channel channel = connection.createChannel();
+
+        // 声明队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+
+        // 绑定队列到交换机
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "item.update");
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "item.delete");
+
+        // 同一时刻服务器只会发一条消息给消费者
+        channel.basicQos(1);
+
+        // 定义队列的消费者
+        QueueingConsumer consumer = new QueueingConsumer(channel);
+        // 监听队列，手动返回完成
+        channel.basicConsume(QUEUE_NAME, false, consumer);
+
+        // 获取消息
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            String message = new String(delivery.getBody());
+            System.out.println(" 前台系统： '" + message + "'");
+            Thread.sleep(10);
+
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+        }
+    }
+}
+```
+消费者二：
+```java
+public class Recv2 {
+    private final static String QUEUE_NAME = "test_queue_topic_2";
+    private final static String EXCHANGE_NAME = "test_exchange_topic";
+    public static void main(String[] argv) throws Exception {
+
+        // 获取到连接以及mq通道
+        Connection connection = ConnectionUtil.getConnection();
+        Channel channel = connection.createChannel();
+
+        // 声明队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+
+        // 绑定队列到交换机
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "item.#");
+
+        // 同一时刻服务器只会发一条消息给消费者
+        channel.basicQos(1);
+
+        // 定义队列的消费者
+        QueueingConsumer consumer = new QueueingConsumer(channel);
+        // 监听队列，手动返回完成
+        channel.basicConsume(QUEUE_NAME, false, consumer);
+
+        // 获取消息
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            String message = new String(delivery.getBody());
+            System.out.println(" 搜索系统： '" + message + "'");
+            Thread.sleep(10);
+
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+        }
+    }
+}
+```
+
+**交换机类型：`Topic Exchange`**
+将路由键和某模式进行匹配。此时队列需要绑定在一个模式上。
+![](/img/rabbitmq/exchange-thrre.png)
+```java
+    Channel channel = connection.createChannel();  
+    channel.exchangeDeclare("exchangeName", "topic"); //direct fanout topic  
+    channel.queueDeclare("queueName");  
+    channel.queueBind("queueName", "exchangeName", "routingKey.*");  
+          
+    byte[] messageBodyBytes = "hello world".getBytes();  
+    channel.basicPublish("exchangeName", "routingKey.one", MessageProperties.PERSISTENT_TEXT_PLAIN, messageBodyBytes);  
+```
 
 **6 RPC**
 远程调用，这种模式，严格意义上来讲，不算是消息队列。可以使用专门的RPC服务框架(比如dubbo：[http://dubbo.io/](http://dubbo.io/))
@@ -490,20 +607,20 @@ public class Recv2 {
 获取连接的类 `ConnectionUtil`:
 ```java
 public class ConnectionUtil {
-	public static Connection getConnection() throws Exception {
-		// 定义连接工厂
-		ConnectionFactory factory = new ConnectionFactory();
-		// 设置服务地址
-		factory.setHost("localhost");
-		// 端口
-		factory.setPort(5672);
-		// 设置账号信息，用户名、密码、vhost
-		factory.setVirtualHost("/taotao");
-		factory.setUsername("taotao");
-		factory.setPassword("taotao");
-		// 通过工程获取连接
-		Connection connection = factory.newConnection();
-		return connection;
-	}
+    public static Connection getConnection() throws Exception {
+        // 定义连接工厂
+        ConnectionFactory factory = new ConnectionFactory();
+        // 设置服务地址
+        factory.setHost("localhost");
+        // 端口
+        factory.setPort(5672);
+        // 设置账号信息，用户名、密码、vhost
+        factory.setVirtualHost("/taotao");
+        factory.setUsername("taotao");
+        factory.setPassword("taotao");
+        // 通过工程获取连接
+        Connection connection = factory.newConnection();
+        return connection;
+    }
 }
 ```
