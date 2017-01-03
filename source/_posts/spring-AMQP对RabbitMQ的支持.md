@@ -7,7 +7,7 @@ tags:
 categories: RabbitMQ
 ---
 
-AMQP(Adanced Mesage Queuing Protocol)：高级消息队列协议。是一个异步消息传递所使用的应用层协议规范。AMQP客户端能够无视消息的来源任意发送和接受消息。spirng-AMQP简化了对MQ的使用，目前还只是支持RabbitMQ。
+AMQP(Adanced Message Queuing Protocol)：高级消息队列协议。是一个异步消息传递所使用的应用层协议规范。AMQP客户端能够无视消息的来源任意发送和接受消息。spirng-AMQP简化了对MQ的使用，目前还只是支持RabbitMQ。
 <!-- more -->
 与spirng整合使用:
 消费者：
