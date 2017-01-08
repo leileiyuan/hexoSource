@@ -1,5 +1,5 @@
 ---
-title: Redis 3.x集群（一主多从）
+title: Redis 3.x主从复制
 date: 2017-01-08 18:06:06
 tags: 
  - redis
